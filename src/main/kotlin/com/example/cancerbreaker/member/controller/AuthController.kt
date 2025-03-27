@@ -14,7 +14,7 @@ class AuthController(private val authService: AuthService) {
 
     @PostMapping("/register")
     fun register(@RequestBody request: UserRegisterRequest) =
-        ResponseEntity.ok("User registered successfully").apply { authService.register(request) }
+        ResponseEntity.ok(authService.register(request))
 
     @PostMapping("/login")
     fun login(@RequestBody request: UserLoginRequest, session: HttpSession): ResponseEntity<String> {

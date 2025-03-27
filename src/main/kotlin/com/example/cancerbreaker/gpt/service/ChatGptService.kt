@@ -1,5 +1,6 @@
 package com.example.cancerbreaker.gpt.service
 
+import com.example.cancerbreaker.board.repository.BoardRepository
 import com.example.cancerbreaker.gpt.dto.GptRequestDto
 import com.example.cancerbreaker.gpt.dto.GptResponseDto
 import com.example.cancerbreaker.gpt.dto.Message
@@ -10,7 +11,8 @@ import reactor.core.publisher.Mono
 
 @Service
 class ChatGptService(
-    private val webClient: WebClient
+    private val webClient: WebClient,
+    private val boardRepository: BoardRepository
 ) {
 
     @Value("\${api.openai.api-key}")
@@ -26,6 +28,24 @@ class ChatGptService(
         val request = GptRequestDto(
             model = model,
             messages = listOf(Message(role = "user", content = prompt))
+        )
+
+        return webClient.post()
+            .uri(apiUrl)
+            .header("Authorization", "Bearer $apiKey")
+            .header("Content-Type", "application/json")
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(GptResponseDto::class.java)
+            .map { it.choices.firstOrNull()?.message?.content ?: "No response" }
+    }
+
+    fun boardSummary(boardId: Long): Mono<String> {
+        val context = boardRepository.findById(boardId).get().content
+
+        val request = GptRequestDto(
+            model = model,
+            messages = listOf(Message(role = "user", content = context + " 요약해줘"))
         )
 
         return webClient.post()

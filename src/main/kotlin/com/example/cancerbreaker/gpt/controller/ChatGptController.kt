@@ -1,5 +1,6 @@
 package com.example.cancerbreaker.gpt.controller
 
+import com.example.cancerbreaker.gpt.dto.GptResponseDto
 import com.example.cancerbreaker.gpt.service.ChatGptService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -16,5 +17,11 @@ class ChatGPTController(
     @GetMapping("/ask")
     fun askGpt(@RequestParam prompt: String): Mono<String> {
         return chatGptService.askGPT(prompt)
+    }
+
+    // 게시글 요약
+    @GetMapping("/summary")
+    fun summaryBoardByGPT(@RequestParam boardId: Long): Mono<String> {
+        return chatGptService.boardSummary(boardId)
     }
 }

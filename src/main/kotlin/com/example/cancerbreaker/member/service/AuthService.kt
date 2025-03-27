@@ -3,6 +3,7 @@ package com.example.cancerbreaker.member.service
 import com.example.cancerbreaker.global.config.PasswordEncoderConfig
 import com.example.cancerbreaker.member.dto.UserLoginRequest
 import com.example.cancerbreaker.member.dto.UserRegisterRequest
+import com.example.cancerbreaker.member.dto.UserRegisterResponse
 import com.example.cancerbreaker.member.entity.User
 import com.example.cancerbreaker.member.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -16,7 +17,8 @@ class AuthService(private val userRepository: UserRepository, private val passwo
         }
         val hashedPassword = passwordEncoder.encode(request.password)
         val user = User(userId = request.userId, username = request.username, password = hashedPassword, role = request.role)
-        return userRepository.save(user)
+        userRepository.save(user)
+        return UserRegisterResponse(user.userId, user.username, user.password ,user.role).fromEntity(user)
     }
 
     fun login(request: UserLoginRequest): User {

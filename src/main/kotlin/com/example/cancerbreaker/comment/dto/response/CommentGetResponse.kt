@@ -8,7 +8,8 @@ import java.time.LocalDateTime
 
 data class CommentGetResponse(
     val content: String = "",
-    val user: User = User()
+    val user: User = User(),
+    val createdAt: LocalDateTime = LocalDateTime.now()
 ) {
-    fun fromEntity(comment: Comment) = CommentGetResponse(comment.content, comment.user)
+    fun fromEntity(comment: Comment) = CommentGetResponse(comment.content, comment.user,comment.createdAt)
 }

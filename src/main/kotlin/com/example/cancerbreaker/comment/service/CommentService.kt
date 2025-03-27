@@ -26,9 +26,7 @@ class CommentService(
             ?: throw IllegalArgumentException("User not logged in")
         val user = userRepository.findByIdOrNull(userId)
         val board = boardRepository.findByIdOrNull(boardId)
-        val createdComment = commentRepository.save(Comment(commentCreateRequest.content,user!!,
-            board!!
-        ))
+        val createdComment = commentRepository.save(Comment(commentCreateRequest.content,user!!,board!!))
         return CommentCreateResponse().fromEntity(createdComment)
     }
 
