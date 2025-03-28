@@ -1,6 +1,5 @@
 package com.example.cancerbreaker.gpt.controller
 
-import com.example.cancerbreaker.gpt.dto.GptResponseDto
 import com.example.cancerbreaker.gpt.service.ChatGptService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
