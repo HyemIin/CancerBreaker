@@ -7,27 +7,26 @@ import com.example.cancerbreaker.board.dto.response.BoardGetResponse
 import com.example.cancerbreaker.board.entity.Board
 import com.example.cancerbreaker.board.entity.BoardCategory
 import com.example.cancerbreaker.board.repository.BoardRepository
+import com.example.cancerbreaker.global.util.SessionUtil
 import com.example.cancerbreaker.gpt.service.ChatGptService
 import com.example.cancerbreaker.member.repository.UserRepository
-import jakarta.servlet.http.HttpSession
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 
 @Service
 class BoardService(
     private val boardRepository: BoardRepository,
     private val userRepository: UserRepository,
-    private val chatGptService: ChatGptService
+    private val chatGptService: ChatGptService,
+    private val sessionUtil: SessionUtil
 ) {
 
     @Transactional
-    fun createBoard(boardCreateRequest: BoardCreateRequest, session: HttpSession) : BoardCreateResponse {
-        val userId = session.getAttribute("id") as Long?
-            ?: throw IllegalArgumentException("User not logged in")
-        val user = userRepository.findByIdOrNull(userId)!!
+    fun createBoard(boardCreateRequest: BoardCreateRequest) : BoardCreateResponse {
+        val userId = sessionUtil.getCurrentUserId()
+        val user = userRepository.findByIdOrNull(userId) ?: throw IllegalArgumentException("사용자를 찾을 수 없습니다.")
         val board = boardRepository.save(Board(boardCreateRequest.title,boardCreateRequest.content,boardCreateRequest.category,user))
         return BoardCreateResponse().fromEntity(board)
     }
@@ -43,9 +42,8 @@ class BoardService(
     }
 
     @Transactional
-    fun editBoardByBoardId(boardId: Long,boardEditRequest: BoardEditRequest,session: HttpSession) : Board? {
-        val userId = session.getAttribute("id") as Long?
-            ?: throw IllegalArgumentException("User not logged in")
+    fun editBoardByBoardId(boardId: Long,boardEditRequest: BoardEditRequest) : Board? {
+        val userId = sessionUtil.getCurrentUserId()
         val board = boardRepository.findByIdOrNull(boardId)
         when (userId) {
             board!!.user.id -> board.updateBoard(boardEditRequest)
@@ -54,9 +52,8 @@ class BoardService(
         return board
     }
     @Transactional
-    fun deleteBoardByBoardId(boardId : Long,session: HttpSession) {
-        val userId = session.getAttribute("id") as Long?
-            ?: throw IllegalArgumentException("User not logged in")
+    fun deleteBoardByBoardId(boardId : Long) {
+        val userId = sessionUtil.getCurrentUserId()
         val board = boardRepository.findByIdOrNull(boardId)
         when (userId) {
             board!!.user.id -> boardRepository.delete(board)

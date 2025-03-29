@@ -1,14 +1,12 @@
 package com.example.cancerbreaker.qna.controller
 
-import com.example.cancerbreaker.board.entity.Board
+import com.example.cancerbreaker.global.aop.SessionCheck
 import com.example.cancerbreaker.qna.dto.request.QnaCreateRequest
 import com.example.cancerbreaker.qna.dto.request.QnaEditRequest
 import com.example.cancerbreaker.qna.dto.response.QnaCreateResponse
 import com.example.cancerbreaker.qna.dto.response.QnaEditResponse
 import com.example.cancerbreaker.qna.dto.response.QnaGetResponse
-import com.example.cancerbreaker.qna.entity.Qna
 import com.example.cancerbreaker.qna.service.QnaService
-import jakarta.servlet.http.HttpSession
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -19,11 +17,11 @@ class QnaController(
 ) {
     // QnA 게시글 생성
     @PostMapping
+    @SessionCheck
     fun createQna(
-        @RequestBody request: QnaCreateRequest,
-        session: HttpSession
+        @RequestBody request: QnaCreateRequest
     ) : ResponseEntity<QnaCreateResponse>
-    = ResponseEntity.ok(qnaService.createQna(request,session))
+    = ResponseEntity.ok(qnaService.createQna(request))
     // QnA 게시글 리스트 조회
     @GetMapping("/all")
     fun getAllQnaList(): ResponseEntity<List<QnaGetResponse>>
@@ -34,10 +32,12 @@ class QnaController(
     = ResponseEntity.ok(qnaService.getQnaById(qnaId))
     // QnA 게시글 수정
     @PutMapping("/{qnaId}")
+    @SessionCheck
     fun editQna(@PathVariable qnaId: Long, @RequestBody request: QnaEditRequest): ResponseEntity<QnaEditResponse>
     = ResponseEntity.ok(qnaService.editQna(qnaId, request))
     // QnA 게시글 삭제
     @DeleteMapping("/{qnaId}")
+    @SessionCheck
     fun deleteQna(@PathVariable qnaId: Long): ResponseEntity<Unit>
     = ResponseEntity.ok(qnaService.deleteQna(qnaId))
 

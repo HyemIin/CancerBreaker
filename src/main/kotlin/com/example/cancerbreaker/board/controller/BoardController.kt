@@ -7,7 +7,7 @@ import com.example.cancerbreaker.board.dto.response.BoardGetResponse
 import com.example.cancerbreaker.board.entity.Board
 import com.example.cancerbreaker.board.entity.BoardCategory
 import com.example.cancerbreaker.board.service.BoardService
-import jakarta.servlet.http.HttpSession
+import com.example.cancerbreaker.global.aop.SessionCheck
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
@@ -18,11 +18,11 @@ class BoardController(private val boardService: BoardService) {
 
     // 게시글 생성
     @PostMapping
+    @SessionCheck
     fun createBoard(
-        @RequestBody request: BoardCreateRequest,
-        session: HttpSession
+        @RequestBody request: BoardCreateRequest
     ): ResponseEntity<BoardCreateResponse> =
-        ResponseEntity.ok(boardService.createBoard(request, session))
+        ResponseEntity.ok(boardService.createBoard(request))
 
 
     // 전체 게시글 불러오기
@@ -41,18 +41,19 @@ class BoardController(private val boardService: BoardService) {
 
     // 게시글 수정
     @PutMapping("/{boardId}")
+    @SessionCheck
     fun editBoard(
         @PathVariable boardId: Long,
-        @RequestBody request: BoardEditRequest,
-        session: HttpSession
+        @RequestBody request: BoardEditRequest
     ): ResponseEntity<Board?> {
-        return ResponseEntity.ok(boardService.editBoardByBoardId(boardId, request, session))
+        return ResponseEntity.ok(boardService.editBoardByBoardId(boardId, request))
     }
 
     // 게시글 삭제
     @DeleteMapping("/{boardId}")
-    fun deleteBoard(@PathVariable boardId: Long, session: HttpSession): ResponseEntity<String> {
-        boardService.deleteBoardByBoardId(boardId, session)
+    @SessionCheck
+    fun deleteBoard(@PathVariable boardId: Long): ResponseEntity<String> {
+        boardService.deleteBoardByBoardId(boardId)
         return ResponseEntity.ok("Board deleted successfully")
     }
 
