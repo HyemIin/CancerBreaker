@@ -27,11 +27,11 @@ class BoardController(private val boardService: BoardService) {
 
     // 전체 게시글 불러오기
     @GetMapping("/all")
-    fun getAllBoardLst(): ResponseEntity<List<Board>> = ResponseEntity.ok(boardService.getAllBoardList())
+    fun getAllBoardLst(): ResponseEntity<List<BoardGetResponse>> = ResponseEntity.ok(boardService.getAllBoardList())
 
     // 카테고리별 게시글 불러오기
     @GetMapping
-    fun getBoardList(@RequestParam category: BoardCategory): ResponseEntity<List<Board>> =
+    fun getBoardList(@RequestParam category: BoardCategory): ResponseEntity<List<BoardGetResponse>> =
         ResponseEntity.ok(boardService.getBoardListByCategory(category) ?: emptyList())
 
     // 특정 게시글 불러오기

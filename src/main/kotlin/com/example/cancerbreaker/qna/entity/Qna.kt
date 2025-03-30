@@ -17,6 +17,9 @@ class Qna(
     @JoinColumn(name = "user_id", nullable = false)
     var user: User,
 
+    @Column(nullable = false)
+    var isPublic: Boolean,
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
@@ -30,5 +33,6 @@ class Qna(
     fun updateQna(qnaEditRequest: QnaEditRequest) {
         this.title = qnaEditRequest.title
         this.content = qnaEditRequest.content
+        this.isPublic = qnaEditRequest.isPublic
     }
 }

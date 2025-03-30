@@ -1,6 +1,7 @@
 package com.example.cancerbreaker.board.entity
 
 import com.example.cancerbreaker.board.dto.request.BoardEditRequest
+import com.example.cancerbreaker.comment.entity.Comment
 import com.example.cancerbreaker.global.entity.BaseEntity
 import com.example.cancerbreaker.member.entity.User
 import jakarta.persistence.*
@@ -23,6 +24,10 @@ class Board(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     var user: User,
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    var comments: List<Comment> = emptyList(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

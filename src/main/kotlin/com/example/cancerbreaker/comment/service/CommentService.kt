@@ -21,12 +21,16 @@ class CommentService(
 ) {
 
     @Transactional
-    fun createComment(commentCreateRequest: CommentCreateRequest, session: HttpSession, boardId:Long) : CommentCreateResponse {
+    fun createComment(
+        commentCreateRequest: CommentCreateRequest,
+        session: HttpSession,
+        boardId: Long
+    ): CommentCreateResponse {
         val userId = session.getAttribute("id") as Long?
             ?: throw IllegalArgumentException("User not logged in")
         val user = userRepository.findByIdOrNull(userId)
         val board = boardRepository.findByIdOrNull(boardId)
-        val createdComment = commentRepository.save(Comment(commentCreateRequest.content,user!!,board!!))
+        val createdComment = commentRepository.save(Comment(commentCreateRequest.content, user!!, board!!))
         return CommentCreateResponse().fromEntity(createdComment)
     }
 
@@ -35,7 +39,7 @@ class CommentService(
         val board = boardRepository.findByIdOrNull(boardId)
             ?: throw IllegalArgumentException("Board not found")
         val comments = commentRepository.findAllByBoard(board)
-        return comments.map { CommentGetResponse().fromEntity(it) }
+        return comments.map { CommentGetResponse.fromEntity(it) }
     }
 
     @Transactional
@@ -47,7 +51,18 @@ class CommentService(
             comment!!.user.id -> comment.updateComment(request)
             else -> throw IllegalArgumentException("당사자만 수정할 수 있습니다.")
         }
-        return CommentGetResponse().fromEntity(comment)
+        return CommentGetResponse.fromEntity(comment)
 
+    }
+
+    @Transactional
+    fun deleteComment(commentId: Long, session: HttpSession) {
+        val userId = session.getAttribute("id") as Long?
+            ?: throw IllegalArgumentException("User not logged in")
+        val comment = commentRepository.findByIdOrNull(commentId)
+        when (userId) {
+            comment!!.user.id -> commentRepository.delete(comment)
+            else -> throw IllegalArgumentException("당사자만 삭제할 수 있습니다.")
+        }
     }
 }

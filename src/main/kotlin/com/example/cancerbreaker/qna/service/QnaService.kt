@@ -24,7 +24,7 @@ class QnaService(
     fun createQna(qnaCreateRequest: QnaCreateRequest) : QnaCreateResponse {
         val userId = sessionUtil.getCurrentUserId()
         val user = userRepository.findByIdOrNull(userId)!!
-        val qna = qnaRepository.save(Qna(qnaCreateRequest.title,qnaCreateRequest.content,user))
+        val qna = qnaRepository.save(Qna(qnaCreateRequest.title,qnaCreateRequest.content,user,qnaCreateRequest.isPublic))
         return QnaCreateResponse().fromEntity(qna)
     }
     // qna 전체 리스트 조회

@@ -23,4 +23,8 @@ class CommentController (private val commentService: CommentService){
     fun editComment(@RequestBody request: CommentEditRequest, session: HttpSession, @PathVariable commentId: Long): ResponseEntity<Any> =
         ResponseEntity.ok(commentService.editComment(commentId, session, request))
 
+    @DeleteMapping("{commentId}")
+    fun deleteComment(@PathVariable commentId: Long,session: HttpSession): ResponseEntity<Unit> =
+        ResponseEntity.ok(commentService.deleteComment(commentId,session))
+
 }

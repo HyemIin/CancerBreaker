@@ -32,7 +32,10 @@ class BoardService(
     }
 
     @Transactional(readOnly = true)
-    fun getBoardListByCategory(category: BoardCategory): List<Board>? = boardRepository.findByCategory(category)
+    fun getBoardListByCategory(category: BoardCategory): List<BoardGetResponse>? {
+        val boards = boardRepository.findByCategory(category)
+        return boards?.map { BoardGetResponse().fromEntity(it) }
+    }
 
 
     @Transactional(readOnly = true)
@@ -62,8 +65,10 @@ class BoardService(
 
     }
     @Transactional(readOnly = true)
-    fun getAllBoardList(): List<Board>? {
-        return boardRepository.findAll()
+    fun getAllBoardList(): List<BoardGetResponse>? {
+        val boards = boardRepository.findAll()
+        println(boards)
+        return boards.map{ BoardGetResponse().fromEntity(it) }
     }
 
     @Transactional(readOnly = true)
