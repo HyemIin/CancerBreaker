@@ -26,7 +26,7 @@ class LogAspect {
         val queryParams = request?.parameterMap?.map { (key, value) -> "$key=${value.joinToString(",")}" }?.joinToString("&") ?: "NONE"
 
 
-        log.info("[START] {} 실행 | \n" +
+        log.info("\n[START] {} 실행 | \n" +
                 "HTTP Method: {} | \n" +
                 "URI: {} | \n"  +
                 "Query Params: {} | \n",

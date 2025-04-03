@@ -7,7 +7,10 @@ import com.example.cancerbreaker.board.dto.response.BoardGetResponse
 import com.example.cancerbreaker.board.entity.Board
 import com.example.cancerbreaker.board.entity.BoardCategory
 import com.example.cancerbreaker.board.repository.BoardRepository
+import com.example.cancerbreaker.global.util.ApiResponse
+import com.example.cancerbreaker.global.util.Error
 import com.example.cancerbreaker.global.util.SessionUtil
+import com.example.cancerbreaker.global.util.Success
 import com.example.cancerbreaker.gpt.service.ChatGptService
 import com.example.cancerbreaker.member.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -24,17 +27,23 @@ class BoardService(
 ) {
 
     @Transactional
-    fun createBoard(boardCreateRequest: BoardCreateRequest) : BoardCreateResponse {
+    fun createBoard(boardCreateRequest: BoardCreateRequest): ApiResponse<BoardCreateResponse> {
         val userId = sessionUtil.getCurrentUserId()
-        val user = userRepository.findByIdOrNull(userId) ?: throw IllegalArgumentException("사용자를 찾을 수 없습니다.")
-        val board = boardRepository.save(Board(boardCreateRequest.title,boardCreateRequest.content,boardCreateRequest.category,user))
-        return BoardCreateResponse().fromEntity(board)
+        val user = userRepository.findByIdOrNull(userId)
+            ?: return Error("사용자를 찾을 수 없습니다.")
+
+        val board = Board(boardCreateRequest.title, boardCreateRequest.content, boardCreateRequest.category, user)
+        val savedBoard = boardRepository.save(board)
+
+        return Success(BoardCreateResponse().fromEntity(savedBoard), "게시글 생성 완료")
     }
 
     @Transactional(readOnly = true)
-    fun getBoardListByCategory(category: BoardCategory): List<BoardGetResponse>? {
+    fun getBoardListByCategory(category: BoardCategory): ApiResponse<List<BoardGetResponse>> {
         val boards = boardRepository.findByCategory(category)
-        return boards?.map { BoardGetResponse().fromEntity(it) }
+        return boards?.map { BoardGetResponse().fromEntity(it) }?.let {
+            Success(it, "Board list retrieved successfully for category: $category")
+        } ?: Error("No boards found for category: $category")
     }
 
 
@@ -65,10 +74,9 @@ class BoardService(
 
     }
     @Transactional(readOnly = true)
-    fun getAllBoardList(): List<BoardGetResponse>? {
+    fun getAllBoardList(): ApiResponse<List<BoardGetResponse>> {
         val boards = boardRepository.findAll()
-        println(boards)
-        return boards.map{ BoardGetResponse().fromEntity(it) }
+        return Success(boards.map { BoardGetResponse().fromEntity(it) }, "게시글 전체 리스트 조회 완료")
     }
 
     @Transactional(readOnly = true)
