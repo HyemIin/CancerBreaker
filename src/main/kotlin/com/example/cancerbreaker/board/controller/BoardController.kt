@@ -9,9 +9,6 @@ import com.example.cancerbreaker.board.entity.BoardCategory
 import com.example.cancerbreaker.board.service.BoardService
 import com.example.cancerbreaker.global.aop.SessionCheck
 import com.example.cancerbreaker.global.util.ApiResponse
-import com.example.cancerbreaker.global.util.Error
-import com.example.cancerbreaker.global.util.Success
-import com.example.cancerbreaker.global.util.handleResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -22,53 +19,62 @@ import reactor.core.publisher.Mono
 class BoardController(private val boardService: BoardService) {
 
     // 게시글 생성
-    @PostMapping
+    @PostMapping()
     @SessionCheck
-    fun createBoard(
-        @RequestBody request: BoardCreateRequest
-    ): ResponseEntity<ApiResponse<BoardCreateResponse>> {
-        val response = boardService.createBoard(request)
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+    fun createBoard(@RequestBody request: BoardCreateRequest): ResponseEntity<ApiResponse<BoardCreateResponse>> {
+        return boardService.executeCreateBoard(request)
+            .fold(
+                onSuccess = {
+                    ResponseEntity.ok(ApiResponse.Success(it, "게시글 생성 완료"))
+                },
+                onFailure = {
+                    ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 
 
     // 전체 게시글 불러오기
     @GetMapping("/all")
-    fun getAllBoardLst(): ResponseEntity<ApiResponse<List<BoardGetResponse>>> {
-        val response = boardService.getAllBoardList()
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+    fun getAllBoardList(): ResponseEntity<ApiResponse<List<BoardGetResponse>>> {
+        return boardService.excuteGetAllBoardList()
+            .fold(
+                onSuccess = {
+                    ResponseEntity.ok(ApiResponse.Success(it, "게시글 전체 리스트 조회 완료"))
+                },
+                onFailure = {
+                    ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 
     // 카테고리별 게시글 불러오기
     @GetMapping
-    fun getBoardList(@RequestParam category: BoardCategory): ResponseEntity<ApiResponse<List<BoardGetResponse>>> {
-        val response = boardService.getBoardListByCategory(category)
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+    fun getBoardsByCategory(@RequestParam category: BoardCategory): ResponseEntity<ApiResponse<List<BoardGetResponse>>> {
+        return boardService.executeGetBoardListByCategory(category)
+            .fold(
+                onSuccess = {
+                    ResponseEntity.ok(ApiResponse.Success(it, "게시글 목록 조회 완료"))
+                },
+                onFailure = {
+                    ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 
     // 특정 게시글 불러오기
     @GetMapping("/{boardId}")
-    fun getOneBoard(@PathVariable boardId: Long): ResponseEntity<ApiResponse<BoardGetResponse?>> {
-        val response = boardService.getBoardByBoardId(boardId)?.let {
-            Success(it, "Board retrieved successfully") as ApiResponse<BoardGetResponse?>
-        } ?: Error("Board with ID $boardId not found")
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+    fun getOneBoard(@PathVariable boardId: Long): ResponseEntity<ApiResponse<BoardGetResponse>> {
+        return boardService.executeGetBoardByBoardId(boardId)
+            .fold(
+                onSuccess = {
+                    ResponseEntity.ok(ApiResponse.Success(it, "게시글 조회 완료"))
+                },
+                onFailure = {
+                    ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 
     // 게시글 수정
@@ -77,58 +83,58 @@ class BoardController(private val boardService: BoardService) {
     fun editBoard(
         @PathVariable boardId: Long,
         @RequestBody request: BoardEditRequest
-    ): ResponseEntity<ApiResponse<Board?>> {
-        val response = boardService.editBoardByBoardId(boardId, request)?.let {
-            Success(it, "Board updated successfully") as ApiResponse<Board?>
-        } ?: Error("Failed to update board with ID $boardId")
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+    ): ResponseEntity<ApiResponse<Board>> {
+        return boardService.editBoardByBoardId(boardId, request)
+            .fold(
+                onSuccess = {
+                    ResponseEntity.ok(ApiResponse.Success(it, "Board updated successfully"))
+                },
+                onFailure = {
+                    ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 
     // 게시글 삭제
     @DeleteMapping("/{boardId}")
     @SessionCheck
     fun deleteBoard(@PathVariable boardId: Long): ResponseEntity<ApiResponse<String>> {
-        val response = try {
-            boardService.deleteBoardByBoardId(boardId)
-            Success("Board deleted successfully", "Deletion completed") as ApiResponse<String>
-        } catch (e: Exception) {
-            Error("Failed to delete board with ID $boardId: ${e.message}")
-        }
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+        return boardService.deleteBoardByBoardId(boardId)
+            .fold(
+                onSuccess = {
+                    ResponseEntity.ok(ApiResponse.Success(it, "Board deleted successfully"))
+                },
+                onFailure = {
+                    ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 
     // 게시글 검색
     @GetMapping("/search")
     fun searchBoard(@RequestParam keyword: String): ResponseEntity<ApiResponse<List<Board>>> {
-        val response = boardService.searchBoard(keyword).let {
-            if (it.isNotEmpty()) Success(it, "Boards found for keyword: $keyword") as ApiResponse<List<Board>>
-            else Error("No boards found for keyword: $keyword")
-        }
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+        return boardService.searchBoard(keyword)
+            .fold(
+                onSuccess = {
+                    ResponseEntity.ok(ApiResponse.Success(it, "Boards found for keyword: $keyword"))
+                },
+                onFailure = {
+                    ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 
     // gpt 게시글 요약
     @GetMapping("/summary/{boardId}")
-    fun boardSummary(@PathVariable boardId: Long): ResponseEntity<ApiResponse<Mono<String>>> {
-        val response = boardService.boardSummary(boardId).let {
-            Success(it, "Board summary retrieved successfully") as ApiResponse<Mono<String>>
-        } ?: Error("Failed to retrieve summary for board with ID $boardId")
-        handleResponse(response)
-        return when (response) {
-            is Success -> ResponseEntity.ok(response)
-            is Error -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
-        }
+    fun boardSummary(@PathVariable boardId: Long): ResponseEntity<ApiResponse<String>> {
+        return boardService.boardSummary(boardId)
+            .fold(
+                onSuccess = { mono ->
+                    ResponseEntity.ok(ApiResponse.Success(mono.block()!!, "Board summary retrieved successfully"))
+                },
+                onFailure = {
+                    ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
+                }
+            )
     }
 }
