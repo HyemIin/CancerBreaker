@@ -57,7 +57,7 @@ class BoardService(
             user = user
         )
     }
-    // 게시글 전체 조회
+    // 게시글 전체 조회(부수효과 포함 로직)
     @Transactional(readOnly = true)
     fun excuteGetAllBoardList(): Result<List<BoardGetResponse>> {
         return getAllBoards(
