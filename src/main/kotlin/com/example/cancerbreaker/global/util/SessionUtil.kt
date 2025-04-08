@@ -10,4 +10,12 @@ class SessionUtil(private val session: HttpSession) {
         return session.getAttribute("id") as Long?
             ?: throw IllegalArgumentException("User not logged in")
     }
+
+    fun setCurrentUserId(userId: Long) {
+        session.setAttribute("id", userId)
+    }
+
+    fun invalidateSession() {
+        session.invalidate()
+    }
 }
