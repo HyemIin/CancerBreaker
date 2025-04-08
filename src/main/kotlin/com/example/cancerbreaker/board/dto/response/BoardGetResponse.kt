@@ -3,6 +3,7 @@ package com.example.cancerbreaker.board.dto.response
 import com.example.cancerbreaker.board.entity.Board
 import com.example.cancerbreaker.board.entity.BoardCategory
 import com.example.cancerbreaker.comment.dto.response.CommentGetResponse
+import com.example.cancerbreaker.member.entity.Role
 import com.example.cancerbreaker.member.entity.User
 import java.time.LocalDateTime
 
@@ -11,7 +12,7 @@ data class BoardGetResponse(
     val title: String = "",
     val content: String = "",
     val category: BoardCategory = BoardCategory.ANTI_CANCER,
-    val user: User = User(),
+    val user: User = User("", "", "", Role.PATIENT),
     val createdAt: LocalDateTime? = LocalDateTime.now(),
     val commentList: List<CommentGetResponse> = emptyList()
 ) {
