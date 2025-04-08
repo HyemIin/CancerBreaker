@@ -69,7 +69,7 @@ class AuthService(
         return runCatching {
             val user = findByUserId(request.userId)
                 ?: throw IllegalArgumentException("Invalid username")
-            if (!matchesPassword(request.password, user.password)) {
+            require (matchesPassword(request.password, user.password)) {
                 throw IllegalArgumentException("Invalid password")
             }
             setSession(user.id!!)
