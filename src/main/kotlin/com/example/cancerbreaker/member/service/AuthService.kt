@@ -35,8 +35,8 @@ class AuthService(
         saveUser: (User) -> User
     ): Result<UserRegisterResponse> {
         return runCatching {
-            if (findByUserId(request.userId) != null) {
-                throw IllegalArgumentException("이미 존재하는 아이디입니다.")
+            require (findByUserId(request.userId) == null) {
+                ("이미 존재하는 아이디입니다.")
             }
             val hashedPassword = encodePassword(request.password)
             val user = User(
@@ -68,9 +68,9 @@ class AuthService(
     ): Result<UserLoginResponse> {
         return runCatching {
             val user = findByUserId(request.userId)
-                ?: throw IllegalArgumentException("Invalid username or password")
+                ?: throw IllegalArgumentException("Invalid username")
             if (!matchesPassword(request.password, user.password)) {
-                throw IllegalArgumentException("Invalid username or password")
+                throw IllegalArgumentException("Invalid password")
             }
             setSession(user.id!!)
             UserLoginResponse(user.id, user.userId, user.username)

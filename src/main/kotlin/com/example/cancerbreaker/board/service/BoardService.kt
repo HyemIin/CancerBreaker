@@ -70,7 +70,7 @@ class BoardService(
     ): Result<List<BoardGetResponse>> {
         return runCatching {
             val boards = findAllBoards()
-            if (boards.isEmpty()) {
+            check (boards.isNotEmpty()) {
                 throw IllegalStateException("게시글 목록이 비어 있습니다.")
             }
             boards.map { BoardGetResponse().fromEntity(it) }
@@ -140,7 +140,7 @@ class BoardService(
             val userId = getUserId()
             val board = findBoard(boardId)
                 ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다.")
-            if (userId != board.user.id) {
+            require (userId == board.user.id) {
                 throw IllegalArgumentException("당사자만 수정할 수 있습니다.")
             }
             board.updateBoard(request)
@@ -170,7 +170,7 @@ class BoardService(
             val userId = getUserId()
             val board = findBoard(boardId)
                 ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다.")
-            if (userId != board.user.id) {
+            require (userId == board.user.id) {
                 throw IllegalArgumentException("당사자만 삭제할 수 있습니다.")
             }
             deleteBoard(board)
@@ -195,7 +195,7 @@ class BoardService(
         return runCatching {
             val modifiedKeyword = "$keyword*" // 와일드카드 추가
             val boards = searchBoards(modifiedKeyword)
-            if (boards.isEmpty()) {
+            require (boards.isNotEmpty()) {
                 throw IllegalArgumentException("No boards found for keyword: $keyword")
             }
             boards

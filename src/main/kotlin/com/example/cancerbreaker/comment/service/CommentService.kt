@@ -34,7 +34,7 @@ class CommentService(
             boardId,
             getUserId = { sessionUtil.getCurrentUserId() },
             findUser = { userId -> userRepository.findByIdOrNull(userId) },
-            findBoard = { boardId -> boardRepository.findByIdOrNull(boardId) },
+            findBoard = { id -> boardRepository.findByIdOrNull(id) },
             saveComment = { comment -> commentRepository.save(comment) }
         )
     }
@@ -136,8 +136,8 @@ class CommentService(
             val userId = getUserId()
             val comment = findComment(commentId)
                 ?: throw IllegalArgumentException("댓글을 찾을 수 없습니다.")
-            if (userId != comment.user.id) {
-                throw IllegalArgumentException("당사자만 삭제할 수 있습니다.")
+            require (userId == comment.user.id) {
+                ("당사자만 삭제할 수 있습니다.")
             }
             deleteComment(comment)
             "댓글 삭제 완료"

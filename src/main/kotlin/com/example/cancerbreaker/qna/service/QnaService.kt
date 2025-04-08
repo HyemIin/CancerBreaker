@@ -102,7 +102,7 @@ class QnaService(
         return runCatching {
             val userId = getUserId()
             val qna = findQna(qnaId) ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다.")
-            if (userId != qna.user.id) {
+            require (userId == qna.user.id) {
                 throw IllegalArgumentException("당사자만 수정할 수 있습니다.")
             }
             qna.updateQna(request)
@@ -130,7 +130,7 @@ class QnaService(
         return runCatching {
             val userId = getUserId()
             val qna = findQna(qnaId) ?: throw IllegalArgumentException("QNA 게시글을 찾을 수 없습니다.")
-            if (userId != qna.user.id) {
+            require (userId == qna.user.id) {
                 throw IllegalArgumentException("당사자만 삭제할 수 있습니다.")
             }
             deleteQna(qna)

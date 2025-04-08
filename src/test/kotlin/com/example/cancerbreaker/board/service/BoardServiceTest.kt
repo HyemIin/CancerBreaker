@@ -6,8 +6,6 @@ import com.example.cancerbreaker.board.entity.BoardCategory
 import com.example.cancerbreaker.member.entity.User
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-
-import org.junit.jupiter.api.Assertions.*
 import kotlin.test.Test
 
 class BoardServiceTest : FunSpec() {
