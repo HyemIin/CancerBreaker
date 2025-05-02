@@ -5,6 +5,7 @@ import com.example.cancerbreaker.comment.dto.request.CommentEditRequest
 import com.example.cancerbreaker.global.entity.BaseEntity
 import com.example.cancerbreaker.member.entity.User
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 
 @Entity

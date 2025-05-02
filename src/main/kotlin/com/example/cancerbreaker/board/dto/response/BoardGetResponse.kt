@@ -12,7 +12,7 @@ data class BoardGetResponse(
     val title: String = "",
     val content: String = "",
     val category: BoardCategory = BoardCategory.ANTI_CANCER,
-    val user: User = User("", "", "", Role.PATIENT),
+    val user: User = User(1L, "", "", "",Role.PATIENT),
     val createdAt: LocalDateTime? = LocalDateTime.now(),
     val commentList: List<CommentGetResponse> = emptyList()
 ) {

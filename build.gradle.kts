@@ -33,6 +33,7 @@ dependencies {
     implementation("mysql:mysql-connector-java:8.0.29")
     implementation("com.fasterxml:classmate:1.5.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
 
     runtimeOnly("com.mysql:mysql-connector-j")
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")

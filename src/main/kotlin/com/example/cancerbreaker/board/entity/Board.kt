@@ -30,16 +30,10 @@ class Board private constructor(
     @JoinColumn(name = "user_id", nullable = false)
     var user: User,
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "board_id")
-    var comments: List<Comment> = emptyList(),
+    var comments: List<Comment> = emptyList()
 ) : BaseEntity() {
-    init {
-        check (title.isNotBlank()) {throw IllegalStateException("제목은 빈 값일 수 없습니다.") }
-        check (content.isNotBlank()) {throw IllegalStateException("내용은 빈 값일 수 없습니다.")}
-        check (category != null) {throw IllegalStateException("카테고리는 빈 값일 수 없습니다.")}
-    }
-
     fun updateBoard(boardEditRequest: BoardEditRequest) {
         require(boardEditRequest.title.isNotBlank()) { "제목은 빈 값일 수 없습니다." }
         require(boardEditRequest.content.isNotBlank()) { "내용은 빈 값일 수 없습니다." }
@@ -53,14 +47,21 @@ class Board private constructor(
             title: String,
             content: String,
             category: BoardCategory,
-            user: User
-        ) : Board = Board(title, content, category, user)
+            user: User,
+            comments: List<Comment>
+        ) : Board {
+            check (title.isNotBlank()) {throw IllegalStateException("제목은 빈 값일 수 없습니다.") }
+            check (content.isNotBlank()) {throw IllegalStateException("내용은 빈 값일 수 없습니다.")}
 
+            return Board(title = title, content = content, category = category, user = user, comments = comments)
+        }
         operator fun invoke(
             title: String,
             content: String,
             category: BoardCategory,
-            user: User) : Board = from(title, content, category, user)
+            user: User,
+            comments: List<Comment>
+        ) : Board = from(title, content, category, user,comments)
     }
 
 }

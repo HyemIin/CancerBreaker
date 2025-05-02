@@ -17,27 +17,31 @@ class User private constructor(
     var password: String = "",
     var role: Role = Role.PATIENT
 ): BaseEntity() {
-    init {
-        check(userId.isNotBlank() && username.isNotBlank() && password.isNotBlank()) {
-            "아이디, 이름, 패스워드는 빈 값일 수 없습니다."
-        }
-    }
-
+    protected constructor() : this(null, "", "", "", Role.PATIENT) {}
+//    init {
+//        check(userId.isNotBlank() && username.isNotBlank() && password.isNotBlank()) {
+//            "아이디, 이름, 패스워드는 빈 값일 수 없습니다."
+//        }
+//    }
     companion object{
         @JsonCreator
         fun from(
+            id : Long?,
             userId: String,
             username: String,
             password: String,
             role: Role
-        ): User = User(userId = userId, username = username, password = password, role = role)
+        ): User {
+            return User(id = id,userId = userId, username = username, password = password, role = role)
+        }
 
 
         operator fun invoke(
+            id: Long?,
             userId: String,
             username: String,
             password: String,
             role: Role
-        ): User = from(userId, username, password, role)
+        ): User = from(id,userId, username, password, role)
     }
 }

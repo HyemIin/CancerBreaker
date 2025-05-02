@@ -54,7 +54,8 @@ class BoardService(
             title = boardCreateRequest.title,
             content = boardCreateRequest.content,
             category = boardCreateRequest.category,
-            user = user
+            user = user,
+            comments = emptyList()
         )
     }
     // 게시글 전체 조회(부수효과 포함 로직)
