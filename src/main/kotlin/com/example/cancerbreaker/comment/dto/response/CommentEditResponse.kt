@@ -6,7 +6,7 @@ import com.example.cancerbreaker.member.entity.User
 
 data class CommentEditResponse(
     val content: String = "",
-    val user: User = User(1L, "", "", "",Role.PATIENT),
+    val user: User = User("", "", "",Role.PATIENT),
 ) {
     fun fromEntity(comment: Comment) = CommentEditResponse(comment.content, comment.user)
 

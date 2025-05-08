@@ -19,10 +19,6 @@ class Comment private constructor(
     @JoinColumn(name = "board_id")
     var board : Board,
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
-
     ) : BaseEntity() {
     init {
         check (content.isNotBlank()) {
@@ -41,7 +37,7 @@ class Comment private constructor(
             content: String,
             user: User,
             board: Board
-        ) : Comment = Comment(content, user, board)
+        ) : Comment = Comment(content=content, user = user, board = board)
 
         operator fun invoke(
             content: String,

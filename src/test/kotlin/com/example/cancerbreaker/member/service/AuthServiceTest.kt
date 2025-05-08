@@ -23,7 +23,6 @@ class AuthServiceTest {
     private val sessionUtil: SessionUtil = mockk()
 
     private val testUser = User(
-        id = 1L,
         userId = "testuser",
         username = "Test User",
         password = "hashedPassword",

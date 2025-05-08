@@ -7,7 +7,7 @@ import com.example.cancerbreaker.member.dto.UserGetDTO
 import com.example.cancerbreaker.member.entity.Role
 import java.time.LocalDateTime
 
-data class BoardGetResponse(
+data class BoardEditResponse(
     val id: Long? = 0L,
     val title: String = "",
     val content: String = "",
@@ -17,7 +17,7 @@ data class BoardGetResponse(
     val commentList: List<CommentGetResponse> = emptyList()
 ) {
     companion object {
-        fun fromEntity(board: Board) = BoardGetResponse(
+        fun fromEntity(board: Board) = BoardEditResponse(
             board.id,
             board.title,
             board.content,

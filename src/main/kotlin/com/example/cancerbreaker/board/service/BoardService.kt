@@ -3,6 +3,7 @@ package com.example.cancerbreaker.board.service
 import com.example.cancerbreaker.board.dto.request.BoardCreateRequest
 import com.example.cancerbreaker.board.dto.request.BoardEditRequest
 import com.example.cancerbreaker.board.dto.response.BoardCreateResponse
+import com.example.cancerbreaker.board.dto.response.BoardEditResponse
 import com.example.cancerbreaker.board.dto.response.BoardGetResponse
 import com.example.cancerbreaker.board.entity.Board
 import com.example.cancerbreaker.board.entity.BoardCategory
@@ -55,7 +56,7 @@ class BoardService(
             content = boardCreateRequest.content,
             category = boardCreateRequest.category,
             user = user,
-            comments = emptyList()
+            comments = mutableListOf()
         )
     }
     // 게시글 전체 조회(부수효과 포함 로직)
@@ -74,7 +75,7 @@ class BoardService(
             check (boards.isNotEmpty()) {
                 throw IllegalStateException("게시글 목록이 비어 있습니다.")
             }
-            boards.map { BoardGetResponse().fromEntity(it) }
+            boards.map { BoardGetResponse.fromEntity(it) }
         }
     }
 
@@ -86,7 +87,7 @@ class BoardService(
             findBoardsByCategory = { cat -> boardRepository.findByCategory(cat) }
         )
     }
-    // 게시글 목록 조회 (비즈니스 로직, 순수 고차 함수)
+    // 카테고리별 게시글 목록 조회 (비즈니스 로직, 순수 고차 함수)
     private fun getBoardListByCategory(
         category: BoardCategory,
         findBoardsByCategory: (BoardCategory) -> List<Board>?
@@ -94,7 +95,7 @@ class BoardService(
         return runCatching {
             val boards = findBoardsByCategory(category)
                 ?: throw IllegalStateException("No boards found for category: $category")
-            boards.map { BoardGetResponse().fromEntity(it) }
+            boards.map { BoardGetResponse.fromEntity(it) }
         }
     }
 
@@ -107,7 +108,7 @@ class BoardService(
         )
     }
 
-    // 게시글 조회(비즈니스 로직, 순수 고차 함수)
+    // 특정 게시글 조회(비즈니스 로직, 순수 고차 함수)
     private fun getBoardByBoardId(
         boardId: Long,
         findBoard: (Long) -> Board?
@@ -115,13 +116,13 @@ class BoardService(
         return runCatching {
             val foundBoard = findBoard(boardId)
                 ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다.")
-            BoardGetResponse().fromEntity(foundBoard)
+            BoardGetResponse.fromEntity(foundBoard)
         }
     }
 
     // 게시글 수정
     @Transactional
-    fun editBoardByBoardId(boardId: Long, boardEditRequest: BoardEditRequest): Result<Board> {
+    fun editBoardByBoardId(boardId: Long, boardEditRequest: BoardEditRequest): Result<BoardEditResponse> {
         return editBoard(
             boardId = boardId,
             request = boardEditRequest,
@@ -136,7 +137,7 @@ class BoardService(
         request: BoardEditRequest,
         getUserId: () -> Long,
         findBoard: (Long) -> Board?
-    ): Result<Board> {
+    ): Result<BoardEditResponse> {
         return runCatching {
             val userId = getUserId()
             val board = findBoard(boardId)
@@ -145,7 +146,7 @@ class BoardService(
                 throw IllegalArgumentException("당사자만 수정할 수 있습니다.")
             }
             board.updateBoard(request)
-            board
+            BoardEditResponse.fromEntity(board)
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.cancerbreaker.board.entity
 import com.example.cancerbreaker.board.dto.request.BoardEditRequest
 import com.example.cancerbreaker.comment.entity.Comment
 import com.example.cancerbreaker.global.entity.BaseEntity
+import com.example.cancerbreaker.member.entity.Role
 import com.example.cancerbreaker.member.entity.User
 import com.fasterxml.jackson.annotation.JsonCreator
 import jakarta.persistence.*
@@ -13,9 +14,6 @@ import jakarta.persistence.*
     indexes = [Index(name = "idx_fts", columnList = "title, content", unique = false)]
 )
 class Board private constructor(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
 
     @Column(nullable = false)
     var title: String,
@@ -28,11 +26,11 @@ class Board private constructor(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: User,
+    var user: User = User("test","test","test",Role.PATIENT),
 
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "board_id")
-    var comments: List<Comment> = emptyList()
+    var comments: MutableList<Comment> = mutableListOf()
 ) : BaseEntity() {
     fun updateBoard(boardEditRequest: BoardEditRequest) {
         require(boardEditRequest.title.isNotBlank()) { "제목은 빈 값일 수 없습니다." }
@@ -48,7 +46,7 @@ class Board private constructor(
             content: String,
             category: BoardCategory,
             user: User,
-            comments: List<Comment>
+            comments: MutableList<Comment>
         ) : Board {
             check (title.isNotBlank()) {throw IllegalStateException("제목은 빈 값일 수 없습니다.") }
             check (content.isNotBlank()) {throw IllegalStateException("내용은 빈 값일 수 없습니다.")}
@@ -60,7 +58,7 @@ class Board private constructor(
             content: String,
             category: BoardCategory,
             user: User,
-            comments: List<Comment>
+            comments: MutableList<Comment>
         ) : Board = from(title, content, category, user,comments)
     }
 

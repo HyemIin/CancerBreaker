@@ -3,6 +3,7 @@ package com.example.cancerbreaker.board.controller
 import com.example.cancerbreaker.board.dto.request.BoardCreateRequest
 import com.example.cancerbreaker.board.dto.request.BoardEditRequest
 import com.example.cancerbreaker.board.dto.response.BoardCreateResponse
+import com.example.cancerbreaker.board.dto.response.BoardEditResponse
 import com.example.cancerbreaker.board.dto.response.BoardGetResponse
 import com.example.cancerbreaker.board.entity.Board
 import com.example.cancerbreaker.board.entity.BoardCategory
@@ -82,7 +83,7 @@ class BoardController(private val boardService: BoardService) {
     fun editBoard(
         @PathVariable boardId: Long,
         @RequestBody request: BoardEditRequest
-    ): ResponseEntity<ApiResponse<Board>> {
+    ): ResponseEntity<ApiResponse<BoardEditResponse>> {
         return boardService.editBoardByBoardId(boardId, request)
             .fold(
                 onSuccess = {

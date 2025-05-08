@@ -2,7 +2,6 @@ package com.example.cancerbreaker.board.repository
 
 import com.example.cancerbreaker.board.entity.Board
 import com.example.cancerbreaker.board.entity.BoardCategory
-import com.example.cancerbreaker.member.entity.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -21,5 +20,4 @@ interface BoardRepository : JpaRepository<Board,Long>{
     )
     fun search(@Param("keyword") keyword: String): List<Board>
 
-//    fun findByIdOrNull(id: Long): Board?
 }

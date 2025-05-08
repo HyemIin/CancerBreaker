@@ -10,7 +10,7 @@ data class QnaGetResponse(
     val title: String = "",
     val content: String = "",
     val isPublic: Boolean = false,
-    val user: User = User(0L, "", "", "",Role.PATIENT),
+    val user: User = User( "", "", "",Role.PATIENT),
     val createdAt : LocalDateTime = LocalDateTime.now()
 ) {
     fun fromEntity(qna: Qna) = QnaGetResponse(qna.id,qna.title, qna.content,qna.isPublic, qna.user, qna.createdAt)

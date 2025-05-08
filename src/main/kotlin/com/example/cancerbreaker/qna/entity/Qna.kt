@@ -21,9 +21,6 @@ class Qna private constructor(
     @Column(nullable = false)
     var isPublic: Boolean,
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
 
 ) :BaseEntity() {
     init {

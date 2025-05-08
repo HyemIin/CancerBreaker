@@ -10,7 +10,8 @@ import com.example.cancerbreaker.gpt.service.ChatGptService
 import com.example.cancerbreaker.member.entity.Role
 import com.example.cancerbreaker.member.entity.User
 import com.example.cancerbreaker.member.repository.UserRepository
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -18,7 +19,9 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.test.util.ReflectionTestUtils
 import reactor.core.publisher.Mono
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 class BoardServiceTest {
@@ -44,15 +47,17 @@ class BoardServiceTest {
 
     @BeforeEach
     fun setUp() {
-        user = User(id = 1L, userId = "testUserId", username = "testUser", password = "password", role = Role.PATIENT)
-        user2 = User(id = 2L, userId = "testUserId2", username = "testUser2", password = "password", role = Role.FAMILIY)
+        user = User(userId = "testUserId", username = "testUser", password = "password", role = Role.PATIENT)
+        ReflectionTestUtils.setField(user, "id", 1L)
+        user2 = User(userId = "testUserId2", username = "testUser2", password = "password", role = Role.FAMILIY)
+        ReflectionTestUtils.setField(user2, "id", 2L)
         println("user: $user")
         board = Board(
             title = "Test Title",
             content = "Test Content",
             category = BoardCategory.ANTI_CANCER,
             user = user,
-            comments = emptyList()
+            comments = mutableListOf()
         )
     }
 
@@ -61,7 +66,7 @@ class BoardServiceTest {
         // Given
         val request = BoardCreateRequest("Test Title", "Test Content", BoardCategory.ANTI_CANCER)
         `when`(sessionUtil.getCurrentUserId()).thenReturn(1L)
-        `when`(userRepository.findByIdOrNull(1L)).thenReturn(user)
+        `when`(userRepository.findById(1L)).thenReturn(Optional.of(user))
         `when`(boardRepository.save(any(Board::class.java))).thenReturn(board)
 
         // When
@@ -82,7 +87,6 @@ class BoardServiceTest {
         // Given
         val request = BoardCreateRequest("Test Title", "Test Content", BoardCategory.ANTI_CANCER)
         `when`(sessionUtil.getCurrentUserId()).thenReturn(1L)
-        `when`(userRepository.findByIdOrNull(1L)).thenReturn(null)
 
         // When
         val result = boardService.executeCreateBoard(request)
@@ -124,7 +128,7 @@ class BoardServiceTest {
     @Test
     fun `executeGetBoardByBoardId - 성공 케이스`() {
         // Given
-        `when`(boardRepository.findByIdOrNull(1L)).thenReturn(board)
+        `when`(boardRepository.findById(1L)).thenReturn(Optional.of(board))
 
         // When
         val result = boardService.executeGetBoardByBoardId(1L)
@@ -140,7 +144,7 @@ class BoardServiceTest {
         // Given
         val editRequest = BoardEditRequest("Updated Title", "Updated Content", BoardCategory.ANTI_CANCER)
         `when`(sessionUtil.getCurrentUserId()).thenReturn(1L)
-        `when`(boardRepository.findByIdOrNull(1L)).thenReturn(board)
+        `when`(boardRepository.findById(1L)).thenReturn(Optional.of(board))
 
         // When
         val result = boardService.editBoardByBoardId(1L, editRequest)
@@ -157,7 +161,7 @@ class BoardServiceTest {
         // Given
         val editRequest = BoardEditRequest("Updated Title", "Updated Content", BoardCategory.ANTI_CANCER)
         `when`(sessionUtil.getCurrentUserId()).thenReturn(2L) // 다른 사용자
-        `when`(boardRepository.findByIdOrNull(1L)).thenReturn(board)
+        `when`(boardRepository.findById(1L)).thenReturn(Optional.of(board))
 
         // When
         val result = boardService.editBoardByBoardId(1L, editRequest)
@@ -171,7 +175,7 @@ class BoardServiceTest {
     fun `deleteBoardByBoardId - 성공 케이스`() {
         // Given
         `when`(sessionUtil.getCurrentUserId()).thenReturn(1L)
-        `when`(boardRepository.findByIdOrNull(1L)).thenReturn(board)
+        `when`(boardRepository.findById(1L)).thenReturn(Optional.of(board))
         doNothing().`when`(boardRepository).delete(board)
 
         // When
@@ -186,7 +190,7 @@ class BoardServiceTest {
     fun `deleteBoardByBoardId - 삭제 시 권한 없음 실패 케이스`() {
         // Given
         `when`(sessionUtil.getCurrentUserId()).thenReturn(2L) // 다른 사용자
-        `when`(boardRepository.findByIdOrNull(1L)).thenReturn(board)
+        `when`(boardRepository.findById(1L)).thenReturn(Optional.of(board))
 
         // When
         val result = boardService.deleteBoardByBoardId(1L)
@@ -215,7 +219,7 @@ class BoardServiceTest {
     @Test
     fun `boardSummary - 성공 케이스`() {
         // Given
-        `when`(boardRepository.findByIdOrNull(1L)).thenReturn(board)
+        `when`(boardRepository.findById(1L)).thenReturn(Optional.of(board))
         `when`(chatGptService.askGPT("아래 글 요약해줘: Test Content")).thenReturn(Mono.just("Summary"))
 
         // When
