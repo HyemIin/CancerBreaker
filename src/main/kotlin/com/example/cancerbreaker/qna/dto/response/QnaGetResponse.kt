@@ -1,5 +1,6 @@
 package com.example.cancerbreaker.qna.dto.response
 
+import com.example.cancerbreaker.member.dto.UserGetDTO
 import com.example.cancerbreaker.member.entity.Role
 import com.example.cancerbreaker.member.entity.User
 import com.example.cancerbreaker.qna.entity.Qna
@@ -10,8 +11,8 @@ data class QnaGetResponse(
     val title: String = "",
     val content: String = "",
     val isPublic: Boolean = false,
-    val user: User = User( "", "", "",Role.PATIENT),
+    val user: UserGetDTO = UserGetDTO( "", "", "",Role.PATIENT),
     val createdAt : LocalDateTime = LocalDateTime.now()
 ) {
-    fun fromEntity(qna: Qna) = QnaGetResponse(qna.id,qna.title, qna.content,qna.isPublic, qna.user, qna.createdAt)
+    fun fromEntity(qna: Qna) = QnaGetResponse(qna.id,qna.title, qna.content,qna.isPublic, qna.user.let { UserGetDTO.fromEntity(it) }, qna.createdAt)
 }
