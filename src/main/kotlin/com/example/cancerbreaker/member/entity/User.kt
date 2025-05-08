@@ -6,12 +6,19 @@ import jakarta.persistence.Entity
 
 @Entity
 class User private constructor(
-
-    var userId: String = "",
-    var username: String = "",
-    var password: String = "",
-    var role: Role = Role.PATIENT
+    userId: String,
+    username: String,
+    password: String,
+    role: Role
 ): BaseEntity() {
+    var userId: String = userId
+        protected set
+    var username: String = username
+        protected set
+    var password: String = password
+        protected set
+    var role: Role = role
+        protected set
     protected constructor() : this("", "", "",  Role.PATIENT) {}
     companion object{
         @JsonCreator

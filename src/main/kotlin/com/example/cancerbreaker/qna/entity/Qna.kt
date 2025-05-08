@@ -8,21 +8,28 @@ import jakarta.persistence.*
 
 @Entity
 class Qna private constructor(
+    title: String,
+    content: String,
+    user: User,
+    isPublic: Boolean
+
+) :BaseEntity() {
     @Column(nullable = false)
-    var title: String = "",
+    var title: String = title
+        protected set
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    var content: String = "",
+    var content: String = content
+        protected set
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: User,
+    var user: User = user
+        protected set
 
     @Column(nullable = false)
-    var isPublic: Boolean,
-
-
-) :BaseEntity() {
+    var isPublic: Boolean = isPublic
+        protected set
     init {
         check (title.isNotBlank()) {("제목은 빈 값일 수 없습니다.")}
         check (content.isNotBlank()) {("내용은 빈 값일 수 없습니다.")}

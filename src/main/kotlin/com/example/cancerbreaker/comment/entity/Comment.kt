@@ -12,16 +12,22 @@ import jakarta.persistence.ManyToOne
 
 @Entity
 class Comment private constructor(
+    content: String,
+    user: User,
+    board: Board
+    ) : BaseEntity() {
+    var content : String = content
+        protected set
 
-    var content : String,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    var user : User,
+    var user : User = user
+        protected set
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    var board : Board,
-
-    ) : BaseEntity() {
+    var board : Board = board
+        protected set
     init {
         check (content.isNotBlank()) {
             throw IllegalStateException("댓글은 빈 값일 수 없습니다.")
