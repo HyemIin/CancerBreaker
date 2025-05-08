@@ -13,11 +13,6 @@ class User private constructor(
     var role: Role = Role.PATIENT
 ): BaseEntity() {
     protected constructor() : this("", "", "",  Role.PATIENT) {}
-//    init {
-//        check(userId.isNotBlank() && username.isNotBlank() && password.isNotBlank()) {
-//            "아이디, 이름, 패스워드는 빈 값일 수 없습니다."
-//        }
-//    }
     companion object{
         @JsonCreator
         fun from(

@@ -9,10 +9,10 @@ import jakarta.persistence.*
 @Entity
 class Qna private constructor(
     @Column(nullable = false)
-    var title: String,
+    var title: String = "",
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    var content: String,
+    var content: String = "",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
