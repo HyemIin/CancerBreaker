@@ -14,7 +14,7 @@ class ChatGPTController(
 ) {
     // gpt 질의
     @GetMapping("/ask")
-    fun askGpt(@RequestParam prompt: String): Mono<String> {
+    suspend fun askGpt(@RequestParam prompt: String): String {
         return chatGptService.askGPT(prompt)
     }
 

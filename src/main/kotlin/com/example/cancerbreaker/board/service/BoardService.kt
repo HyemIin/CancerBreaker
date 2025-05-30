@@ -205,27 +205,45 @@ class BoardService(
     }
     // 게시글 요약(GPT)
     @Transactional(readOnly = true)
-    fun boardSummary(boardId: Long): Result<Mono<String>> {
+    suspend fun boardSummary(boardId: Long): Result<String> {
         return getBoardSummary(
             boardId = boardId,
-            findBoard = { id -> Mono.justOrEmpty(boardRepository.findByIdOrNull(id)) } // Mono로 래핑
-        ) { content -> chatGptService.askGPT("아래 글 요약해줘: $content") }
+            findBoard = { id -> boardRepository.findByIdOrNull(id) },
+            summarize = { content -> chatGptService.askGPT("아래 글 요약해줘: $content") }
+        )
     }
 
-    // 부수효과 최소화 및 참조 투명성을 위한 고차 함수
-    private fun getBoardSummary(
+    private suspend fun getBoardSummary(
         boardId: Long,
-        findBoard: (Long) -> Mono<Board>,
-        summarize: (String) -> Mono<String>
-    ): Result<Mono<String>> {
-        return try {
-            val boardMono = findBoard(boardId)
-            val summaryMono = boardMono
-                .switchIfEmpty(Mono.error(IllegalArgumentException("게시글을 찾을 수 없습니다.")))
-                .flatMap { board -> summarize(board.content) }
-            Result.success(summaryMono)
-        } catch (e: Exception) {
-            Result.failure(e)
+        findBoard: suspend (Long) -> Board?,
+        summarize: suspend (String) -> String
+    ): Result<String> {
+        return runCatching {
+            val board = findBoard(boardId)
+                ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다.")
+            summarize(board.content)
+        }
+    }
+
+    //동기 방식(테스트용)
+    @Transactional(readOnly = true)
+    fun synBoardSummary(boardId: Long): Result<String> {
+        return synGetBoardSummary(
+            boardId = boardId,
+            findBoard = { id -> boardRepository.findByIdOrNull(id) },
+            summarize = { content -> chatGptService.synAskGPT("아래 글 요약해줘: $content") }
+        )
+    }
+
+    private fun synGetBoardSummary(
+        boardId: Long,
+        findBoard: (Long) -> Board?,
+        summarize: (String) -> String
+    ): Result<String> {
+        return runCatching {
+            val board = findBoard(boardId)
+                ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다.")
+            summarize(board.content)
         }
     }
 }

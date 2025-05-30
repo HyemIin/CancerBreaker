@@ -5,6 +5,7 @@ import com.example.cancerbreaker.comment.dto.request.CommentEditRequest
 import com.example.cancerbreaker.global.entity.BaseEntity
 import com.example.cancerbreaker.member.entity.User
 import com.fasterxml.jackson.annotation.JsonCreator
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
@@ -16,6 +17,7 @@ class Comment private constructor(
     user: User,
     board: Board
     ) : BaseEntity() {
+    @Column(nullable = false)
     var content : String = content
         protected set
 

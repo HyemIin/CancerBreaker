@@ -39,8 +39,7 @@ class Board private constructor(
 
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "board_id")
-    var comments: MutableList<Comment> = comments
-        protected set
+    val comments: MutableList<Comment> = comments
 
     fun updateBoard(boardEditRequest: BoardEditRequest) {
         require(boardEditRequest.title.isNotBlank()) { "제목은 빈 값일 수 없습니다." }

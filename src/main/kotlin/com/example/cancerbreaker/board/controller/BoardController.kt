@@ -10,6 +10,8 @@ import com.example.cancerbreaker.board.entity.BoardCategory
 import com.example.cancerbreaker.board.service.BoardService
 import com.example.cancerbreaker.global.aop.SessionCheck
 import com.example.cancerbreaker.global.util.ApiResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -126,11 +128,23 @@ class BoardController(private val boardService: BoardService) {
 
     // gpt 게시글 요약
     @GetMapping("/summary/{boardId}")
-    fun boardSummary(@PathVariable boardId: Long): ResponseEntity<ApiResponse<String>> {
-        return boardService.boardSummary(boardId)
+    suspend fun boardSummary(@PathVariable boardId: Long): ResponseEntity<ApiResponse<String>> = withContext(Dispatchers.IO) {
+        boardService.boardSummary(boardId).fold(
+            onSuccess = { summary ->
+                ResponseEntity.ok(ApiResponse.Success(summary, "Board summary retrieved successfully"))
+            },
+            onFailure = { exception ->
+                ResponseEntity.badRequest().body(ApiResponse.Error(exception.message ?: "알 수 없는 오류"))
+            }
+        )
+    }
+    // gpt 게시글 요약(동기 방식)
+    @GetMapping("/synsummary/{boardId}")
+    fun synBoardSummary(@PathVariable boardId: Long): ResponseEntity<ApiResponse<String>> {
+        return boardService.synBoardSummary(boardId)
             .fold(
-                onSuccess = { mono ->
-                    ResponseEntity.ok(ApiResponse.Success(mono.block()!!, "Board summary retrieved successfully"))
+                onSuccess = { summary ->
+                    ResponseEntity.ok(ApiResponse.Success(summary, "Board summary retrieved successfully"))
                 },
                 onFailure = {
                     ResponseEntity.badRequest().body(ApiResponse.Error(it.message ?: "알 수 없는 오류"))
